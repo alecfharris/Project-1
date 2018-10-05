@@ -1,0 +1,18 @@
+body {
+    background-image: url("https://www.nextworm.com/wp-content/uploads/2017/07/games.jpg");
+}
+
+.jumbotron {
+    margin-bottom: 0px;
+    opacity: 0.2;
+    color: #fff;
+    background: #000  background none;
+}
+
+.jumbotron p {
+    color: #fff;
+}
+
+.jumbotron h1 {
+    color: #fff;
+}
