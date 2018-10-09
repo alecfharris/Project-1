@@ -111,13 +111,13 @@ function placeMarkers(latlngObj, childSnapshot) {
       title: childSnapshot.val().title
     });
     var contentString = '<div class="content">' + '<div class="siteNotice">' + '</div>' + '<h1 class="game-title">' +
-    childSnapshot.val().title + '</h1>' + '<div class="bodyContent">'+ '<p>' + '<strong>Description: </strong>' + childSnapshot.val().description + '</p>' + '<p>' + '<strong>Game Owner: </strong>' + childSnapshot.val().name + '</p>'
-    + '<p>' + '<strong>Contact Info: </strong>' + childSnapshot.val().contact + '<p>' + '<strong>Game Location: </strong>' + childSnapshot.val().address + '</p>' + '</div>' +'</div>';
+      childSnapshot.val().title + '</h1>' + '<div class="bodyContent">' + '<p>' + '<strong>Description: </strong>' + childSnapshot.val().description + '</p>' + '<p>' + '<strong>Game Owner: </strong>' + childSnapshot.val().name + '</p>'
+      + '<p>' + '<strong>Contact Info: </strong>' + childSnapshot.val().contact + '<p>' + '<strong>Game Location: </strong>' + childSnapshot.val().address + '</p>' + '</div>' + '</div>';
     var infoWindow = new google.maps.InfoWindow({
       content: contentString
     });
     marker.setMap(map);
-    marker.addListener('click', function() {
+    marker.addListener('click', function () {
       infoWindow.open(map, marker);
     })
   }
@@ -183,7 +183,40 @@ function getAddress() {
           var lat = parseFloat(lati);
           var lng = parseFloat(longi);
           myLatLng = { lat, lng };
-          compareDistance({ lat, lng}, childSnapshot);
+          //function to search the api
+          function showWeather() {
+
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lng + "&units=imperial&APPID=7379902a075c3fc260a1353fb52dc81f";
+
+            $.ajax({
+              url: queryURL,
+              method: "GET"
+            })
+              .then(function (callback) {
+                var results = callback;
+                //if statement to post the rain if it has rained in the last hour.
+                if (results.rain) {
+                  var rainChance = $("<p>").text("amount of rain in the past hour: " + results.rain["1h"] + " in");
+                  //displays the rain in the past hour.
+                  $("#display").append(rainChance);
+                }
+                else {
+                  var noRain = $("<p>").text("There is no rain in your area.");
+                  //displays if there is no rain.
+                  $("#display").append(noRain);
+                }
+
+                var windy = $("<p>").text("wind speed: " + results.wind.speed + " mph");
+                var temperature = $("<p>").text("temperature: " + results.main.temp + " F");
+                //displays the wind speed and temperature
+                $("#display").append(windy);
+                $("#display").append(temperature);
+              });
+          }
+            //grabbing the lat and lng vars and passing them into the function to search the api.
+            showWeather(lat, lng);
+
+          compareDistance({ lat, lng }, childSnapshot);
         })
       } else {
         window.alert('No results found');
