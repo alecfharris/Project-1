@@ -183,9 +183,8 @@ function getAddress() {
           var lat = parseFloat(lati);
           var lng = parseFloat(longi);
           myLatLng = { lat, lng };
-
+          //function to search the api
           function showWeather() {
-            $("#city-display").empty();
 
             var queryURL = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lng + "&units=imperial&APPID=7379902a075c3fc260a1353fb52dc81f";
 
@@ -193,26 +192,28 @@ function getAddress() {
               url: queryURL,
               method: "GET"
             })
-              .then(function (response) {
-                var results = response;
-                console.log(response);
+              .then(function (callback) {
+                var results = callback;
+                //if statement to post the rain if it has rained in the last hour.
                 if (results.rain) {
                   var rainChance = $("<p>").text("amount of rain in the past hour: " + results.rain["1h"] + " in");
-                  $("#city-display").append(rainChance);
+                  //displays the rain in the past hour.
+                  $("#display").append(rainChance);
                 }
                 else {
                   var noRain = $("<p>").text("There is no rain in your area.");
-                  $("#city-display").append(noRain);
+                  //displays if there is no rain.
+                  $("#display").append(noRain);
                 }
 
                 var windy = $("<p>").text("wind speed: " + results.wind.speed + " mph");
                 var temperature = $("<p>").text("temperature: " + results.main.temp + " F");
-
-                $("#city-display").append(windy);
-                $("#city-display").append(temperature);
+                //displays the wind speed and temperature
+                $("#display").append(windy);
+                $("#display").append(temperature);
               });
           }
-
+            //grabbing the lat and lng vars and passing them into the function to search the api.
             showWeather(lat, lng);
 
           compareDistance({ lat, lng }, childSnapshot);
