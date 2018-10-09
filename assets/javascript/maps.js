@@ -103,7 +103,6 @@ function codeAddress() {
 }
 
 function placeMarkers(latlngObj, childSnapshot) {
-  console.log('lat/long from placeMarkers: ', latlngObj);
   if (latlngObj && Object.keys(latlngObj).length > 0) {
     var marker = new google.maps.Marker({
       position: latlngObj,
@@ -176,6 +175,7 @@ function getAddress() {
     if (status === 'OK') {
       if (results[0]) {
         realLoc = results[0].formatted_address;
+        console.log(results[0]);
         //Create Firebase event for adding location to the database and add a marker
         database.ref().on("child_added", function (childSnapshot, prevChildKey) {
           lati = childSnapshot.val().pos.lati;
