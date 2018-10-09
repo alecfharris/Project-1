@@ -111,13 +111,13 @@ function placeMarkers(latlngObj, childSnapshot) {
       title: childSnapshot.val().title
     });
     var contentString = '<div class="content">' + '<div class="siteNotice">' + '</div>' + '<h1 class="game-title">' +
-    childSnapshot.val().title + '</h1>' + '<div class="bodyContent">'+ '<p>' + '<strong>Description: </strong>' + childSnapshot.val().description + '</p>' + '<p>' + '<strong>Game Owner: </strong>' + childSnapshot.val().name + '</p>'
-    + '<p>' + '<strong>Contact Info: </strong>' + childSnapshot.val().contact + '<p>' + '<strong>Game Location: </strong>' + childSnapshot.val().address + '</p>' + '</div>' +'</div>';
+      childSnapshot.val().title + '</h1>' + '<div class="bodyContent">' + '<p>' + '<strong>Description: </strong>' + childSnapshot.val().description + '</p>' + '<p>' + '<strong>Game Owner: </strong>' + childSnapshot.val().name + '</p>'
+      + '<p>' + '<strong>Contact Info: </strong>' + childSnapshot.val().contact + '<p>' + '<strong>Game Location: </strong>' + childSnapshot.val().address + '</p>' + '</div>' + '</div>';
     var infoWindow = new google.maps.InfoWindow({
       content: contentString
     });
     marker.setMap(map);
-    marker.addListener('click', function() {
+    marker.addListener('click', function () {
       infoWindow.open(map, marker);
     })
   }
@@ -183,7 +183,39 @@ function getAddress() {
           var lat = parseFloat(lati);
           var lng = parseFloat(longi);
           myLatLng = { lat, lng };
-          compareDistance({ lat, lng}, childSnapshot);
+
+          function showWeather() {
+            $("#city-display").empty();
+
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lng + "&units=imperial&APPID=7379902a075c3fc260a1353fb52dc81f";
+
+            $.ajax({
+              url: queryURL,
+              method: "GET"
+            })
+              .then(function (response) {
+                var results = response;
+                console.log(response);
+                if (results.rain) {
+                  var rainChance = $("<p>").text("amount of rain in the past hour: " + results.rain["1h"] + " in");
+                  $("#city-display").append(rainChance);
+                }
+                else {
+                  var noRain = $("<p>").text("There is no rain in your area.");
+                  $("#city-display").append(noRain);
+                }
+
+                var windy = $("<p>").text("wind speed: " + results.wind.speed + " mph");
+                var temperature = $("<p>").text("temperature: " + results.main.temp + " F");
+
+                $("#city-display").append(windy);
+                $("#city-display").append(temperature);
+              });
+          }
+
+            showWeather(lat, lng);
+
+          compareDistance({ lat, lng }, childSnapshot);
         })
       } else {
         window.alert('No results found');
