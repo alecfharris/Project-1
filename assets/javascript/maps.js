@@ -3,7 +3,6 @@ var currentLocation = {};
 var realLoc = "";
 var distanceNum = 3;
 var service;
-// var childSnapshot;
 
 // Initialize Firebase
 var config = {
@@ -71,6 +70,12 @@ function codeAddress() {
   var description = document.getElementById('game-description').value;
   var name = document.getElementById('name').value;
   var contact = document.getElementById('contact').value;
+
+  document.getElementById('address').value = 'Address';
+  document.getElementById('game-title').value = 'Game Title';
+  document.getElementById('game-description').value = 'Game Description';
+  document.getElementById('name').value = 'Name of Game Owner';
+  document.getElementById('contact').value = 'Contact Info'
   geocoder.geocode({ 'address': address }, function (results, status) {
     if (status == 'OK') {
       map.setCenter(results[0].geometry.location);
@@ -82,7 +87,6 @@ function codeAddress() {
         lati: marker.position.lat(),
         longi: marker.position.lng()
       }
-      console.log(pos);
       var game = {
         pos: pos,
         address: address,
@@ -92,10 +96,6 @@ function codeAddress() {
         contact: contact
       }
       database.ref().push(game);
-      // database.ref().push(title);
-      // database.ref().push(description);
-      // database.ref().push(name);
-      // database.ref().push(contact);
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
     }
@@ -110,7 +110,6 @@ function placeMarkers(latlngObj, childSnapshot) {
       map: map,
       title: childSnapshot.val().title
     });
-    console.log(childSnapshot.val().title);
     var contentString = '<div class="content">' + '<div class="siteNotice">' + '</div>' + '<h1 class="game-title">' +
     childSnapshot.val().title + '</h1>' + '<div class="bodyContent">'+ '<p>' + '<strong>Description: </strong>' + childSnapshot.val().description + '</p>' + '<p>' + '<strong>Game Owner: </strong>' + childSnapshot.val().name + '</p>'
     + '<p>' + '<strong>Contact Info: </strong>' + childSnapshot.val().contact + '<p>' + '<strong>Game Location: </strong>' + childSnapshot.val().address + '</p>' + '</div>' +'</div>';
@@ -131,15 +130,10 @@ function compareDistance(latlngObj, childSnapshot) {
       origins: [realLoc],
       destinations: [latlngObj],
       travelMode: 'DRIVING',
-      // transitOptions: TransitOptions,
-      // drivingOptions: DrivingOptions,
       unitSystem: google.maps.UnitSystem.IMPERIAL
-      // avoidHighways: Boolean,
-      // avoidTolls: Boolean,
     }, function (response, status) {
       compareCallback(response, status, latlngObj, childSnapshot);
     });
-    console.log(childSnapshot.val().title);
 
 
 }
@@ -149,17 +143,13 @@ function compareCallback(response, status, latlngObj, childSnapshot) {
   // the basics of a callback function.
   if (status == 'OK') {
     var origins = response.originAddresses;
-    console.log('origins:', origins);
     var destinations = response.destinationAddresses;
-    console.log(destinations);
 
     for (var i = 0; i < origins.length; i++) {
       var results = response.rows[i].elements;
-      console.log(results);
       if (results.length > 0) {
         for (var j = 0; j < results.length; j++) {
           var element = results[j];
-          console.log(element);
 
           var distance = element.distance.text;
           var duration = element.duration.text;
@@ -171,7 +161,6 @@ function compareCallback(response, status, latlngObj, childSnapshot) {
         //place markers if distance is close enough
         if (distanceNum <= 30.0) {
           placeMarkers(latlngObj, childSnapshot);
-          console.log("Test");
         }
       }
 
@@ -186,7 +175,6 @@ function getAddress() {
   geocoder.geocode({ 'location': latlng }, function (results, status) {
     if (status === 'OK') {
       if (results[0]) {
-        console.log(results[0].formatted_address);
         realLoc = results[0].formatted_address;
         //Create Firebase event for adding location to the database and add a marker
         database.ref().on("child_added", function (childSnapshot, prevChildKey) {
@@ -195,12 +183,8 @@ function getAddress() {
           var lat = parseFloat(lati);
           var lng = parseFloat(longi);
           myLatLng = { lat, lng };
-          console.log(childSnapshot.val().title);
-          console.log(myLatLng);
           compareDistance({ lat, lng}, childSnapshot);
-          console.log(distanceNum);
         })
-        // compareDistance();
       } else {
         window.alert('No results found');
       }
