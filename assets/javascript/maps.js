@@ -44,7 +44,7 @@ function initMap() {
       map.setCenter(pos);
       currentLocation = pos;
       getAddress();
-      
+
     }, function () {
       handleLocationError(true, infoWindow, map.getCenter());
     });
@@ -66,6 +66,16 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 function codeAddress() {
   var geocoder = new google.maps.Geocoder();
   var address = document.getElementById('address').value;
+  var title = document.getElementById('game-title').value;
+  var description = document.getElementById('game-description').value;
+  var name = document.getElementById('name').value;
+  var contact = document.getElementById('contact').value;
+
+  document.getElementById('address').value = 'Address';
+  document.getElementById('game-title').value = 'Game Title';
+  document.getElementById('game-description').value = 'Game Description';
+  document.getElementById('name').value = 'Name of Game Owner';
+  document.getElementById('contact').value = 'Contact Info'
   geocoder.geocode({ 'address': address }, function (results, status) {
     if (status == 'OK') {
       map.setCenter(results[0].geometry.location);
@@ -77,62 +87,70 @@ function codeAddress() {
         lati: marker.position.lat(),
         longi: marker.position.lng()
       }
-      console.log(pos);
-      database.ref().push(pos);
+      var game = {
+        pos: pos,
+        address: address,
+        title: title,
+        description: description,
+        name: name,
+        contact: contact
+      }
+      database.ref().push(game);
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
     }
   });
 }
 
-function placeMarkers(latlngObj) {
+function placeMarkers(latlngObj, childSnapshot) {
   console.log('lat/long from placeMarkers: ', latlngObj);
-  if(latlngObj && Object.keys(latlngObj).length > 0) {
+  if (latlngObj && Object.keys(latlngObj).length > 0) {
     var marker = new google.maps.Marker({
       position: latlngObj,
       map: map,
-      title: 'Hello World!'
+      title: childSnapshot.val().title
+    });
+    var contentString = '<div class="content">' + '<div class="siteNotice">' + '</div>' + '<h1 class="game-title">' +
+    childSnapshot.val().title + '</h1>' + '<div class="bodyContent">'+ '<p>' + '<strong>Description: </strong>' + childSnapshot.val().description + '</p>' + '<p>' + '<strong>Game Owner: </strong>' + childSnapshot.val().name + '</p>'
+    + '<p>' + '<strong>Contact Info: </strong>' + childSnapshot.val().contact + '<p>' + '<strong>Game Location: </strong>' + childSnapshot.val().address + '</p>' + '</div>' +'</div>';
+    var infoWindow = new google.maps.InfoWindow({
+      content: contentString
     });
     marker.setMap(map);
+    marker.addListener('click', function() {
+      infoWindow.open(map, marker);
+    })
   }
 }
 
 //compare the distance between the user and nearby games and put markers on games that are nearby
-function compareDistance(latlngObj) {
+function compareDistance(latlngObj, childSnapshot) {
   service.getDistanceMatrix(
     {
       origins: [realLoc],
       destinations: [latlngObj],
       travelMode: 'DRIVING',
-      // transitOptions: TransitOptions,
-      // drivingOptions: DrivingOptions,
       unitSystem: google.maps.UnitSystem.IMPERIAL
-      // avoidHighways: Boolean,
-      // avoidTolls: Boolean,
     }, function (response, status) {
-      compareCallback(response, status, latlngObj);
+      compareCallback(response, status, latlngObj, childSnapshot);
     });
 
-  
+
 }
 
-function compareCallback(response, status, latlngObj) {
+function compareCallback(response, status, latlngObj, childSnapshot) {
   // See Parsing the Results for
   // the basics of a callback function.
   if (status == 'OK') {
     var origins = response.originAddresses;
-    console.log('origins:', origins);
     var destinations = response.destinationAddresses;
-    console.log(destinations);
 
     for (var i = 0; i < origins.length; i++) {
       var results = response.rows[i].elements;
-      console.log(results);
-      if(results.length > 0) {
+      if (results.length > 0) {
         for (var j = 0; j < results.length; j++) {
           var element = results[j];
-          console.log(element);
-          
+
           var distance = element.distance.text;
           var duration = element.duration.text;
           var from = origins[i];
@@ -142,11 +160,10 @@ function compareCallback(response, status, latlngObj) {
         distanceNum = parseFloat(arrDistance[0]);
         //place markers if distance is close enough
         if (distanceNum <= 30.0) {
-          placeMarkers(latlngObj);
-          console.log("Test");
+          placeMarkers(latlngObj, childSnapshot);
         }
       }
-      
+
     }
   }
 }
@@ -158,20 +175,16 @@ function getAddress() {
   geocoder.geocode({ 'location': latlng }, function (results, status) {
     if (status === 'OK') {
       if (results[0]) {
-        console.log(results[0].formatted_address);
         realLoc = results[0].formatted_address;
         //Create Firebase event for adding location to the database and add a marker
-      database.ref().on("child_added", function (childSnapshot, prevChildKey) {
-        lati = childSnapshot.val().lati;
-        longi = childSnapshot.val().longi;
-        var lat = parseFloat(lati);
-        var lng = parseFloat(longi);
-        myLatLng = { lat, lng };
-        console.log(myLatLng);
-        compareDistance({ lat, lng });
-        console.log(distanceNum);
-      })
-        // compareDistance();
+        database.ref().on("child_added", function (childSnapshot, prevChildKey) {
+          lati = childSnapshot.val().pos.lati;
+          longi = childSnapshot.val().pos.longi;
+          var lat = parseFloat(lati);
+          var lng = parseFloat(longi);
+          myLatLng = { lat, lng };
+          compareDistance({ lat, lng}, childSnapshot);
+        })
       } else {
         window.alert('No results found');
       }
