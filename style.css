@@ -1,7 +1,8 @@
-body {
-    background-image: url("https://www.nextworm.com/wp-content/uploads/2017/07/games.jpg");
+ body {
+    background-image: url("https://hmsnews.org/wp-content/uploads/2017/03/sports.jpg");
+    /* filter: blur(8px);
+    -webkit-filter: blur(8px); */
 }
-
 
 .adv {
     color:blue;
@@ -9,5 +10,9 @@ body {
 }
 
 .form-group {
-    color: blue;
+  color:blue;
+}
+
+.nav-link {
+    color:white;
 }
