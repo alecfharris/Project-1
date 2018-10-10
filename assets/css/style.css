@@ -1,0 +1,22 @@
+#bg{
+    background: black;
+}
+#jumbo1{
+    margin: 50px;
+    padding: 50px;
+    background: whitesmoke;
+}
+
+#input-text{
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+
+.text-input{
+    margin: 5px;
+}
+
+#submit{
+    background: red;
+    border-color: red;
+}

@@ -7,19 +7,41 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
     <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://api.openweathermap.org/data/2.5/weather?lat=+ lat +&lon=+ lng + &units=imperial&APPID=7379902a075c3fc260a1353fb52dc81f"></script>
 </head>
 
-<body>
-    <div id="map" style="width:50%;height:400px;"></div>
-    <div>
-        <input id="game-title" type="textbox" value="Game Title">
-        <input id="game-description" type="textbox" value="Game Description">
-        <input id="name" type="textbox" value="Name of Game Owner">
-        <input id="address" type="textbox" value="Address">
-        <input id="contact" type="textbox" value="Contact Info">
-        <input type="button" value="Encode" onclick="codeAddress()">
+
+<header>
+</header>
+
+<body id="bg">
+    <div class="container">
+
+        <div class="jumbotron" id="jumbo1">
+            <h1 class="display-4">U-Game</h1>
+            <p class="lead">Finding people that love what you love!</p>
+            <hr class="my-4">
+            <div id="map" style="width:50%;height:400px;"></div>
+            <div id="input-text">
+                <input id="game-title" class="text-input" type="textbox" value="Game Title">
+                <input id="game-description" class="text-input" type="textbox" value="Game Description">
+                <input id="name" class="text-input" type="textbox" value="Name of Game Owner">
+                <input id="address" class="text-input" type="textbox" value="Address">
+                <input id="contact" class="text-input" type="textbox" value="Contact Info">              
+            </div>
+            <input type="button" id="submit" class="btn btn-primary btn-lg" value="Submit" onclick="codeAddress()">
+        </div>
+
+
+        <br>
+
     </div>
 
     <script type='text/javascript' src='assets/javascript/config.js'></script>
